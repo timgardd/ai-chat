@@ -7,12 +7,12 @@ module.exports = [
       globals: {
         window: "readonly",
         document: "readonly",
-        console: "readonly"
-      }
+        console: "readonly",
+      },
     },
     rules: {
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-      "no-undef": "error"
-    }
-  }
+      "no-undef": "error",
+    },
+  },
 ];

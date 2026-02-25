@@ -2,7 +2,7 @@ const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
 const messages = document.getElementById("messages");
 
-sendBtn.addEventListener("click", () => {
+function sendMessage() {
   const text = messageInput.value.trim();
   if (!text) return;
 
@@ -12,5 +12,16 @@ sendBtn.addEventListener("click", () => {
 
   messages.appendChild(message);
 
+  // Scroll to bottom
+  messages.scrollTop = messages.scrollHeight;
+
   messageInput.value = "";
+}
+
+sendBtn.addEventListener("click", sendMessage);
+
+messageInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
 });

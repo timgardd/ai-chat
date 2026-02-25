@@ -8,6 +8,9 @@ module.exports = [
         window: "readonly",
         document: "readonly",
         console: "readonly",
+        HTMLElement: "readonly",
+        customElements: "readonly",
+        module: "readonly",
       },
     },
     rules: {

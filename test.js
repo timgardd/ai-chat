@@ -1,2 +1,4 @@
-const x = 1;
-console.log(x);
+function add(a, b) {
+  return a + b;
+}
+console.log(add(1, 2));

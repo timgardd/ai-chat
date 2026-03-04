@@ -26,8 +26,7 @@ const messagesContainer = document.getElementById("messages");
 const initialMessages = [
   {
     role: "user",
-    content:
-      "Hey, can you recommend some good sci-fi movies that came out in the last 5 years?",
+    content: "Hey, can you recommend some good sci-fi movies that came out in the last 5 years?",
   },
   {
     role: "ai",

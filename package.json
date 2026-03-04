@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint ",
     "format": "prettier . --write",
-    "prepare": "husky",
-    "build:css": "tailwindcss -i ./source.css -o ./styles.css"
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,css,html,json,md}": [
@@ -29,12 +29,11 @@
   },
   "homepage": "https://github.com/timgardd/ai-chat#readme",
   "devDependencies": {
-    "autoprefixer": "^10.4.26",
+    "@eslint/js": "^10.0.1",
     "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "postcss": "^8.5.6",
-    "prettier": "^3.8.1",
-    "tailwindcss": "^3.4.19"
+    "prettier": "^3.8.1"
   }
 }

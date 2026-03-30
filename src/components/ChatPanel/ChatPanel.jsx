@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef } from "react";
 import Message from "./Message";
 import InputForm from "./InputForm";

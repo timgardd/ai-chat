@@ -1,14 +1,18 @@
-const ConversationItem = ({ conversation, isActive, onClick }) => {
+import Link from "next/link";
+
+const ConversationItem = ({ conversation, isActive }) => {
   return (
     <li>
-      <button
-        onClick={onClick}
-        className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
-          isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-800"
+      <Link
+        href={`/c/${conversation.id}`}
+        className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${
+          isActive
+            ? "bg-blue-600 text-white"
+            : "text-gray-300 hover:bg-gray-800 hover:text-white"
         }`}
       >
-        <span className="block truncate">{conversation.title}</span>
-      </button>
+        <div className="truncate font-medium">{conversation.title}</div>
+      </Link>
     </li>
   );
 };

@@ -1,29 +1,22 @@
-# Next.js AI Chat - Assignment 06
-
-This is the final AI Chat Application featuring an intelligent Next.js backend, a persistent SQLite database using Prisma, and TanStack React Query for instantaneous cache synchronization.
+# Next.js AI Chat
 
 ## Setup Instructions
 
 ### 1. Environment Variables
-Create a `.env.local` file in the root directory (you can copy `.env.example`):
+Create a `.env.local` file in the root folder and add your key:
 ```bash
-OPENROUTER_API_KEY="your-openrouter-key-here"
+OPENROUTER_API_KEY="your-api-key-here"
 ```
 
-### 2. Install Dependencies
+### 2. Install and run database
 ```bash
 npm install
-```
-
-### 3. Generate Database
-Initialize the Prisma Client natively to establish the SQLite `dev.db`:
-```bash
 npx prisma db push
 ```
 
-### 4. Run Development Server
+### 3. Run the app
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000` to interact with the streaming LLM chat! All chats and messages are completely persistent using Prisma ORM.
+Open `http://localhost:3000` to use the chat.

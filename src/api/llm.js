@@ -1,5 +1,5 @@
 export const requestLLMResponse = async (messagesContext, onChunk) => {
-  // Call the Next.js local API route instead of OpenRouter directly!
+  
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -10,8 +10,7 @@ export const requestLLMResponse = async (messagesContext, onChunk) => {
     throw new Error("Failed to get LLM response from server");
   }
 
-  // Next.js server intelligently unwraps the SSE JSON payload,
-  // we just stream the pure UTF-8 text strings native to the browser reader!
+  // read stream
   const reader = res.body.getReader();
   const decoder = new TextDecoder("utf-8");
 

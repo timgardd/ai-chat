@@ -1,86 +1,93 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ChatPanel from "@/components/ChatPanel/ChatPanel";
-import { getMessages, createMessage } from "@/api/messages";
 import { requestLLMResponse } from "@/api/llm";
 
 export default function ConversationPage() {
   const params = useParams();
   const conversationId = params?.id as string;
-  const [messages, setMessages] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamContent, setStreamContent] = useState("");
 
-  // Requirement: Messages should be fetched when the active conversation changes
-  useEffect(() => {
-    let mounted = true;
-    if (conversationId) {
-      getMessages(conversationId).then(data => {
-        if (mounted) setMessages(data);
+  const { data: messages = [], isLoading: isFetching } = useQuery({
+    queryKey: ['messages', conversationId],
+    queryFn: async () => {
+      if (!conversationId) return [];
+      const res = await fetch(`/api/messages?conversationId=${conversationId}`);
+      if (!res.ok) throw new Error("Failed to fetch messages");
+      return res.json();
+    },
+    enabled: !!conversationId
+  });
+
+  const saveMessage = useMutation({
+    mutationFn: async (msgData: any) => {
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(msgData),
       });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', conversationId] });
     }
-    return () => { mounted = false; };
-  }, [conversationId]); // ONLY runs when strictly conversationId changes
+  });
 
   const handleSendMessage = async (content: string) => {
-    if (!conversationId || isLoading) return;
+    if (!conversationId || isStreaming) return;
 
-    setIsLoading(true);
+    setIsStreaming(true);
+    setStreamContent("");
 
     try {
-      const userMessage = await createMessage({
+      const userMessage = await saveMessage.mutateAsync({
         conversationId,
         role: "user",
         content,
       });
 
-      // User message appears in the chat immediately
-      setMessages(prev => [...prev, userMessage]);
-
-      const messagesContext = [...messages, userMessage];
-
-      const tempId = `temp-${Date.now()}`;
-      setMessages(prev => [...prev, {
-        id: tempId,
-        conversationId,
-        role: "assistant",
-        content: ""
-      }]);
+      const currentMessages = queryClient.getQueryData<any[]>(['messages', conversationId]) || [];
+      const messagesContext = [...currentMessages.filter(m => m.id !== userMessage.id), userMessage];
 
       let finalContent = "";
+      
       await requestLLMResponse(messagesContext, (chunk: string) => {
         finalContent += chunk;
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === tempId ? { ...msg, content: finalContent } : msg
-          )
-        );
+        setStreamContent(finalContent);
       });
 
-      // Assistant message immediately synchronizes
-      const assistantMessage = await createMessage({
+      await saveMessage.mutateAsync({
         conversationId,
         role: "assistant",
         content: finalContent
       });
 
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === tempId ? assistantMessage : msg
-        )
-      );
-
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("Failed to process conversation stream:", error);
     } finally {
-      setIsLoading(false);
+      setIsStreaming(false);
+      setStreamContent("");
     }
   };
 
+  const displayMessages = [...messages];
+  if (isStreaming) {
+    displayMessages.push({
+      id: "temp-stream",
+      conversationId,
+      role: "assistant",
+      content: streamContent
+    });
+  }
+
   return (
     <ChatPanel
-      messages={messages}
-      isLoading={isLoading}
+      messages={displayMessages}
+      isLoading={isFetching || isStreaming}
       onSendMessage={handleSendMessage}
     />
   );

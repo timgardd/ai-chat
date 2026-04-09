@@ -36,3 +36,5 @@ build-utf8.log
 
 # typescript
 *.tsbuildinfo
+
+/src/generated/prisma

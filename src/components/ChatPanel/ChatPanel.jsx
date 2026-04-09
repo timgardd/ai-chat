@@ -16,7 +16,6 @@ const ChatPanel = ({ messages, isLoading, onSendMessage }) => {
   }, [messages, isLoading]);
 
   // The AI is "Thinking" (waiting for the very first chunk)
-  // if isLoading is true, and the last message in the array is an EMPTY assistant message.
   const lastMessage = messages[messages.length - 1];
   const isWaitingForAIChunk =
     isLoading && lastMessage && lastMessage.role === "assistant" && !lastMessage.content;

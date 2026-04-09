@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
             try {
               const data = JSON.parse(dataStr);
               if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                // Yield purely the text content chunk, keeping the browser logic extremely simple and safe
                 controller.enqueue(encoder.encode(data.choices[0].delta.content));
               }
             } catch (e) {}

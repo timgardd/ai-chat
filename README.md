@@ -1,6 +1,6 @@
 # Next.js AI Chat - Assignment 06
 
-This is the final AI Chat Application featuring an intelligent Next.js backend, a persistent SQLite database using Prisma, and TanStack React Query for instantaneous cache synchronization.
+This is the final 6th assignment AI Chat Application featuring an intelligent Next.js backend, a persistent SQLite database using Prisma, and TanStack React Query for instantaneous cache synchronization.
 
 ## Setup Instructions
 

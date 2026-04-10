@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { getConversations, createConversation } from '@/db/queries';
 
 export async function GET() {
-  const conversations = await prisma.conversation.findMany({
-    orderBy: { createdAt: 'desc' }
-  });
+  const conversations = await getConversations();
   return NextResponse.json(conversations);
 }
 
@@ -12,9 +10,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const title = body.title || "New Chat";
   
-  const conversation = await prisma.conversation.create({
-    data: { title }
-  });
+  const conversation = await createConversation(title);
   
   return NextResponse.json(conversation);
 }

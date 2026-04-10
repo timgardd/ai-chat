@@ -1,61 +1,63 @@
-import { NextRequest, NextResponse } from "next/server";
+import { streamText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createMessage, ensureConversation } from '@/db/queries';
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { messagesArray } = body;
-  const apiKey = process.env.OPENROUTER_API_KEY || "YOUR_API_KEY_HERE";
+const MODEL = 'openai/gpt-4o-mini';
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "Next.js Web Chat",
-      },
-      body: JSON.stringify({
-          model: "openrouter/free",
-          messages: messagesArray.map((m: any) => ({ role: m.role, content: m.content })),
-          stream: true,
-      }),
-  });
+function extractText(msg: any): string {
+  if (msg.parts && Array.isArray(msg.parts)) {
+    return msg.parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('');
+  }
+  if (typeof msg.content === 'string') return msg.content;
+  if (Array.isArray(msg.content)) {
+    return msg.content.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('');
+  }
+  return String(msg.content || '');
+}
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      if (!response.body) {
-        controller.close();
-        return;
-      }
-      
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      const encoder = new TextEncoder();
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const conversationId = body.id as string;
+    const messages: any[] = body.messages ?? [];
 
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
+    if (!conversationId) return new Response('Missing conversationId', { status: 400 });
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
+    const latestMessage = messages[messages.length - 1];
+    if (!latestMessage) return new Response('No messages provided', { status: 400 });
 
-        for (const line of lines) {
-          if (line.startsWith("data:")) {
-            const dataStr = line.replace("data:", "").trim();
-            if (dataStr === "[DONE]") continue;
-            if (!dataStr) continue;
+    const userText = extractText(latestMessage);
 
-            try {
-              const data = JSON.parse(dataStr);
-              if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                controller.enqueue(encoder.encode(data.choices[0].delta.content));
-              }
-            } catch (e) {}
-          }
-        }
-      }
-      controller.close();
+    await ensureConversation(conversationId, userText.slice(0, 50) || 'New Chat');
+
+    if (userText) {
+      await createMessage({ role: 'user', content: userText, conversationId });
     }
-  });
 
-  return new NextResponse(stream);
+    const modelMessages = messages.map((m: any) => ({
+      role: m.role as 'user' | 'assistant',
+      content: extractText(m) || ' ',
+    }));
+
+    const client = createOpenAI({
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey: process.env.OPENROUTER_API_KEY || '',
+      compatibility: 'compatible',
+    });
+
+    const result = streamText({
+      model: client.chat(MODEL),
+      system: 'You are a helpful, friendly AI assistant. Answer questions clearly and concisely. Be conversational and engaging.',
+      messages: modelMessages,
+      async onFinish({ text }) {
+        if (text) {
+          await createMessage({ role: 'assistant', content: text, conversationId });
+        }
+      },
+    });
+
+    return result.toUIMessageStreamResponse();
+  } catch (e: any) {
+    return new Response(e.message || 'Internal Server Error', { status: 500 });
+  }
 }

@@ -1,22 +1,20 @@
-# Next.js AI Chat
+# AI Chat
 
-## Setup Instructions
+## Setup
 
-### 1. Environment Variables
-Create a `.env.local` file in the root folder and add your key:
-```bash
+Create a `.env.local` file in the root:
+
+```
 OPENROUTER_API_KEY="your-api-key-here"
+DATABASE_URL="file:./dev.db"
 ```
 
-### 2. Install and run database
+## Run
+
 ```bash
 npm install
 npx prisma db push
-```
-
-### 3. Run the app
-```bash
 npm run dev
 ```
 
-Open `http://localhost:3000` to use the chat.
+Open [http://localhost:3000](http://localhost:3000)

@@ -4,21 +4,25 @@ import Message from "./Message";
 import InputForm from "./InputForm";
 import LoadingIndicator from "./LoadingIndicator";
 
-const ChatPanel = ({ messages, isLoading, onSendMessage }) => {
+const ChatPanel = ({ messages, isLoading, sendMessage }) => {
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // The AI is "Thinking" (waiting for the very first chunk)
   const lastMessage = messages[messages.length - 1];
+  
+  function hasText(msg) {
+    if (!msg) return false;
+    if (msg.parts && Array.isArray(msg.parts)) {
+      if (msg.parts.some(p => p.type === 'text' && p.text)) return true;
+    }
+    return !!msg.content;
+  }
+
   const isWaitingForAIChunk =
-    isLoading && lastMessage && lastMessage.role === "assistant" && !lastMessage.content;
+    isLoading && (!lastMessage || lastMessage.role === "user" || !hasText(lastMessage));
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50 h-full">
@@ -30,14 +34,10 @@ const ChatPanel = ({ messages, isLoading, onSendMessage }) => {
         ) : (
           messages.map((msg) => <Message key={msg.id} message={msg} />)
         )}
-
-        {/* Only show the loading bouncy dots BEFORE the text starts writing */}
         {isWaitingForAIChunk && <LoadingIndicator />}
-
         <div ref={messagesEndRef} />
       </div>
-
-      <InputForm onSend={onSendMessage} isLoading={isLoading} />
+      <InputForm isLoading={isLoading} sendMessage={sendMessage} />
     </div>
   );
 };

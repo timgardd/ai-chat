@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-const ConversationItem = ({ conversation, isActive }) => {
+const ConversationItem = ({ conversation, isActive, onDoubleClick }) => {
   return (
-    <li>
+    <li onDoubleClick={onDoubleClick}>
       <Link
         href={`/c/${conversation.id}`}
         className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${

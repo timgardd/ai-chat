@@ -4,33 +4,25 @@ import { useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
 import ChatPanel from "@/components/ChatPanel/ChatPanel";
 
-export default function ChatClient({ 
-  conversationId, 
-  initialMessages 
-}: { 
+export default function ChatClient({
+  conversationId,
+  initialMessages,
+}: {
   conversationId: string;
-  initialMessages: any[]; 
+  initialMessages: any[];
 }) {
-  const mappedMessages = initialMessages.map(m => ({
-    id: String(m.id),
-    role: m.role as "user" | "assistant",
-    content: m.content,
-    parts: [{ type: 'text' as const, text: m.content }]
-  }));
-  
   const { messages, setMessages, sendMessage, status, error } = useChat({
     id: conversationId,
     api: '/api/chat',
     body: { id: conversationId },
-    initialMessages: mappedMessages
+    initialMessages,
   });
 
   useEffect(() => {
-    if (messages.length === 0 && mappedMessages.length > 0) {
-      setMessages(mappedMessages);
+    if (messages.length === 0 && initialMessages.length > 0) {
+      setMessages(initialMessages);
     }
-  }, [conversationId, mappedMessages.length]);
-
+  }, [conversationId]);
 
   const isLoading = status === 'streaming' || status === 'submitted';
 
@@ -38,7 +30,6 @@ export default function ChatClient({
     <div className="flex flex-col h-full w-full relative">
       <ChatPanel
         messages={messages || []}
-
         isLoading={isLoading}
         sendMessage={sendMessage}
       />

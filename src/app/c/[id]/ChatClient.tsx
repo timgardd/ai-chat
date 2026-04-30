@@ -13,6 +13,7 @@ export default function ChatClient({
 }) {
   const { messages, setMessages, sendMessage, status, error } = useChat({
     id: conversationId,
+    // @ts-expect-error - body property is not recognized but needed
     body: { id: conversationId },
     initialMessages,
   });

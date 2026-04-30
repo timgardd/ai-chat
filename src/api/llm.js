@@ -1,5 +1,5 @@
 export const requestLLMResponse = async (messagesContext, onChunk) => {
-  
+
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -10,7 +10,7 @@ export const requestLLMResponse = async (messagesContext, onChunk) => {
     throw new Error("Failed to get LLM response from server");
   }
 
-  // read stream
+
   const reader = res.body.getReader();
   const decoder = new TextDecoder("utf-8");
 

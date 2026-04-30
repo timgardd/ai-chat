@@ -13,10 +13,9 @@ export default function ChatClient({
 }) {
   const { messages, setMessages, sendMessage, status, error } = useChat({
     id: conversationId,
-    // @ts-expect-error - body property is not recognized but needed
     body: { id: conversationId },
     initialMessages,
-  });
+  } as any);
 
   useEffect(() => {
     if (messages.length === 0 && initialMessages.length > 0) {

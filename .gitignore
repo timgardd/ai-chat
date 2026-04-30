@@ -39,5 +39,6 @@ build-utf8.log
 
 /src/generated/prisma
 
+# sqlite
 *.db
 *.db-journal

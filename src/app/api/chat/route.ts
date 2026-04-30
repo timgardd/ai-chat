@@ -26,7 +26,6 @@ export async function POST(req: Request) {
     const client = createOpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey: process.env.OPENROUTER_API_KEY || '',
-      compatibility: 'compatible',
     });
 
     const result = streamText({

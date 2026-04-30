@@ -13,7 +13,6 @@ export default function ChatClient({
 }) {
   const { messages, setMessages, sendMessage, status, error } = useChat({
     id: conversationId,
-    api: '/api/chat',
     body: { id: conversationId },
     initialMessages,
   });

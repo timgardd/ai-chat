@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-chat-cache-v1';
+const CACHE_NAME = 'ai-chat-cache-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
@@ -35,19 +35,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(
-    fetch(request)
-      .catch(() => {
-        return caches.match(request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
 
-          if (request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-          return new Response('', { status: 408, statusText: 'Request timed out.' });
-        });
-      })
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+
+  event.respondWith(
+    caches.match(request).then((cachedResponse) => {
+      return cachedResponse || fetch(request);
+    })
   );
 });

@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased bg-gray-50 text-gray-900 h-screen w-full overflow-hidden flex flex-col md:flex-row" suppressHydrationWarning>
+      <body className="antialiased bg-gray-50 text-gray-900 h-[100dvh] w-full overflow-hidden flex flex-col md:flex-row" suppressHydrationWarning>
         <Providers>
           <Suspense fallback={<SidebarSkeleton />}>
             <Sidebar />

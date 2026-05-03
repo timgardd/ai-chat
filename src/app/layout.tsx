@@ -3,11 +3,18 @@ import { Suspense } from "react";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import SidebarSkeleton from "@/components/Sidebar/SidebarSkeleton";
 import Providers from "@/components/Providers";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Assignment 07: Architecture Refactor",
-  description: "Prisma and TanStack Query enabled",
+  title: "AI Chat App",
+  description: "Progressive Web App enabled AI Chat",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "AI Chat",
+  },
 };
 
 export default function RootLayout({
@@ -25,6 +32,7 @@ export default function RootLayout({
           <main className="flex-1 overflow-hidden">
             {children}
           </main>
+          <ServiceWorkerRegister />
         </Providers>
       </body>
     </html>

@@ -1,5 +1,5 @@
-// TODO: Insert your real OpenRouter API key here before testing!
-const API_KEY = "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";
+
+const API_KEY = "Please insert your API key here";
 
 export async function streamChat(messages, onChunkCallback) {
   const payload = {
